@@ -13,10 +13,15 @@ input[type=radio] {
 
 .line {
     display: block;
+    border: solid 1px transparent;
 }
 
 .line.selected {
     border: solid 1px yellowgreen;
+}
+
+.line.hovered {
+    border: solid 1px darkgrey;
 }
 
 .line-number {

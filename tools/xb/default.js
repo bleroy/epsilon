@@ -218,9 +218,20 @@ document.addEventListener('DOMContentLoaded', e => {
             const lineRef = e.target.dataset.lineRef;
             const ref = ast[lineRef];
             if (ref && ref.el) {
-                prettySrc.querySelectorAll("span.selected").forEach(el => el.className = el.className.replace(" selected", ""));
+                prettySrc.querySelectorAll("span.line.selected").forEach(el => el.className = el.className.replace(" selected", ""));
                 ref.el.className += " selected";
                 ref.el.scrollIntoView();
+            }
+        }
+    });
+
+    prettySrc.addEventListener("mouseover", e => {
+        prettySrc.querySelectorAll("span.line.hovered").forEach(el => el.className = el.className.replace(" hovered", ""));
+        if (e.target.dataset) {
+            const lineRef = e.target.dataset.lineRef;
+            const ref = ast[lineRef];
+            if (ref && ref.el) {
+                ref.el.className += " hovered";
             }
         }
     });
