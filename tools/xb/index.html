@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>TI-99/4A Extended Basic source code browser</title>
+        <link rel="stylesheet" type="text/css" href="default.css"/>
+        <link rel="shortcut icon" href="./assets/xb.png"> 
+    </head>
+    <body>
+        <h1 id="title">TI-99/4A Extended Basic source code browser</h1>
+        <div id="pretty-tab" class="active-tab">
+            <input type="radio" name="tab" id="pretty-btn" value="pretty" checked/>
+            <label for="pretty-btn" id="pretty-label" tabindex="0">Pretty</label>
+        </div>
+        <div id="original-tab" class="inactive-tab">
+            <input type="radio" name="tab" id="original-btn" value="original"/>
+            <label for="original-btn" id="original-label" tabindex="1">Original</label>
+        </div>
+        <div id="pretty-source" class="source active-pane">... Loading [pretty] ...</div>
+        <div id="original-source" class="source inactive-pane">... Loading ...</div>
+        <script type="module" src="./default.js"></script>
+    </body>
+</html>
