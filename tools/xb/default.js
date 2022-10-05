@@ -3,6 +3,13 @@
 
 'use strict'
 
+/** Creates a child element under an existing one.
+ * @param {HTMLElement} parent The element under which to create the new element.
+ * @param {string} className The CSS class for the new element.
+ * @param {string} text The inner text for the new element.
+ * @param {string} tag The tag name for the new element. `span` is used if this is omitted.
+ * @param {Object} attr Optional attribute values.
+ * @returns {HTMLElement} The new element. */
 function el(parent, className = "", text = "", tag = "span", attr = {}) {
     const el = document.createElement(tag);
     el.className = className;
@@ -14,27 +21,67 @@ function el(parent, className = "", text = "", tag = "span", attr = {}) {
     return el;
 }
 
+/** Indents an element by adding a 2em margin per tab stop.
+ * @param {HTMLElement} el The element to indent.
+ * @param {number} indent The number of indentation tab stops to apply. */
 function addIndentation(el, indent) {
     el.style.marginLeft = (indent * 2) + "em";
 }
 
-// This is obviously not how you build a proper parser.
-// The idea here is to make the code more readable, not to understand it so it'll do.
+/**
+ * @typedef {Object} LineOfCode
+ * @property {number} lineNumber The line number.
+ * @property {string} src The source code for the line of code. 
+ * @property {string[]} instructions The source code for the separate instructions contained in the line of code.
+ * @property {HTMLElement} el A reference to the HTML element representation for the line of code.
+ * @property {number} indent The level of indentation after the last instruction of the line of code. */
+
+
+/** Parses and renders a line of Extended Basic code.
+ * This is obviously not how you build a proper parser.
+ * The idea here is to make the code more readable, not to understand it so it'll do.
+ * @param {HTMLElement} pane The element to which to append the prettified line of code.
+ * @param {number} lineNumber The line number.
+ * @param {string} instructionsStr The line of code.
+ * @param {number} indent The current indentation level at the beginning of the line of code.
+ * @returns {LineOfCode} A representation of the parsed line of code. */
 function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
     const lineEl = el(pane, "line");
     el(lineEl, "line-number", lineNumber);
     const instructionsEl = el(lineEl, "instructions");
+    
+    /** Whether we are within a string constant.
+     * @type {Boolean} */
     let inString = null;
+    /** The next position (after token and separator) in the remaing string to parse.
+     * @type {number} */
     let nextPos = 0;
+    /** The part of the line of code that remains to be parsed.
+     * @type {string} */
     let remaining = instructionsStr;
+    /** The current nesting of `if` statements.
+     * @type {number} */
     let ifDepth = 0;
+    /** The element surrounding the current instruction's rendering.
+     * @type {HTMLElement} */
     let instructionEl = el(instructionsEl, "instruction");
     addIndentation(instructionEl, indent);
+    /** Is the current token the first on in the current instruction?
+     * @type {Boolean} */
     let firstToken = true;
+    /** The list of instructions (in source form) so far on this line.
+     * @type {string[]} */
     const instructions = [];
+    /** The source code so far for the current instruction.
+     * @type {string} */
     let instruction = "";
+    /** The last instruction token found.
+     * @type {string} */
     let lastInstruction = "";
-    let lastTokenClass = "";
+    /** The last token found.
+     * @type {string} */
+    let lastToken = "";
+    
     do {
         let nextQuoteIndex;
         if (inString !== null) {
@@ -75,6 +122,7 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
             let nextSeparator = nextPos < remaining.length ? remaining.charAt(nextPos) : '';
             const tokenClass =
                 (keywords.indexOf(token) != -1) ? "keyword" :
+                lastToken === "CALL" || lastToken === "SUB" ? "token" :
                 numbers.test(token) ? "number" :
                 hex.test(token) ? "hex" :
                 "token";
@@ -100,7 +148,8 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
                 addIndentation(instructionEl, indent - 1 + ifDepth);
             }
             const tokenEl = el(instructionEl, tokenClass, token);
-            if (tokenClass === "number" && instructionsThatCanGoto.indexOf(lastInstruction) !== -1 && lastTokenClass === "keyword") {
+            // Is this a line number reference?
+            if (tokenClass === "number" && instructionsThatCanGoto.indexOf(lastInstruction) !== -1 && instructionsThatCanGoto.indexOf(lastToken) !== -1) {
                 tokenEl.dataset.lineRef = parseInt(token, 10);
                 tokenEl.className += " line-number-reference";
             }
@@ -116,6 +165,13 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
                 addIndentation(instructionEl, indent + ifDepth);
                 firstToken = true;
             }
+            if (lastInstruction === "SUB" && lastToken === "SUB") {
+                lineEl.dataset.sub = token;
+            }
+            if (lastToken === "CALL" && tokenClass === "token") {
+                tokenEl.dataset.subRef = token;
+                tokenEl.className = "token sub-reference"
+            }
             if (nextPos === nextInstructionSeparatorIndex) {
                 // We're done with this instruction, start a new one
                 instructions.push(instruction);
@@ -125,8 +181,14 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
                 firstToken = true;
                 nextSeparator = remaining.match(instructionSeparator)[0];
             }
+            // Debugging data
+            tokenEl.dataset.lastInstruction = lastInstruction;
+            tokenEl.dataset.lastToken = lastToken;
+            tokenEl.dataset.indent = indent;
+            tokenEl.dataset.ifDepth = ifDepth;
+            // Advance to the next token
             remaining = remaining.substring(nextPos + nextSeparator.length);
-            lastTokenClass = tokenClass;
+            lastToken = token;
         }
     } while (remaining);
     return {
@@ -155,7 +217,7 @@ const keywords = [
 ];
 
 const instructionsThatCanGoto = [
-    "GOTO", "GO", "GOSUB", "IF", "THEN", "ELSE", "RESTORE", "ON", "BREAK", "CONTINUE", "RETURN", "RUN"
+    "GOTO", "GO", "GOSUB", "IF", "THEN", "ELSE", "RESTORE", "ON", "BREAK", "ERROR", "CONTINUE", "RETURN", "RUN"
 ];
 
 const instructionSeparator = /\s*::\s*/;
@@ -172,6 +234,7 @@ document.addEventListener('DOMContentLoaded', e => {
     const originalTab = document.getElementById("original-tab");
     const prettyRadio = document.getElementById("pretty-btn");
     const radios = document.querySelectorAll("input[type=radio]");
+    const hexView = document.getElementById("hex-view");
 
     let srcFileUrl = window.location.search;
     if (srcFileUrl.charAt(0) === '?') {
@@ -190,7 +253,7 @@ document.addEventListener('DOMContentLoaded', e => {
                 const { lineNumberStr, instructionsStr } =
                     line.match(/^(?<lineNumberStr>\d+)\s+(?<instructionsStr>.*)$/).groups;
                 const lineNumber = parseInt(lineNumberStr, 10);
-                ast[lineNumber] = parseAndRenderLine(prettySrc, lineNumber, instructionsStr);
+                ast[lineNumber] = parseAndRenderLine(prettySrc, lineNumber, instructionsStr, indent);
                 indent = ast[lineNumber].indent;
             }
         });
@@ -216,12 +279,40 @@ document.addEventListener('DOMContentLoaded', e => {
     prettySrc.addEventListener("click", e => {
         if (e.target.dataset) {
             const lineRef = e.target.dataset.lineRef;
-            const ref = ast[lineRef];
+            const subRef = e.target.dataset.subRef;
+            const ref = lineRef ? ast[lineRef] : subRef ? { el: prettySrc.querySelectorAll(`[data-sub=\"${subRef}\"]`)[0]} : null;
             if (ref && ref.el) {
                 prettySrc.querySelectorAll("span.line.selected").forEach(el => el.className = el.className.replace(" selected", ""));
                 ref.el.className += " selected";
                 ref.el.scrollIntoView();
             }
+        }
+        if (e.target.className.indexOf("hex") !== -1) {
+            prettySrc.querySelectorAll(".hex.selected").forEach(el => el.className = el.className.replace(" selected", ""));
+            e.target.className += " selected";
+            let hex = e.target.innerText;
+            if (hexView.dataset.hex === hex) return;
+            hexView.innerHTML = "";
+            if (hex.length % 2) hex = hex + "0";
+            let tbody = el(hexView, "", "", "tbody");
+            for (let i = 0; i < hex.length / 2; i++) {
+                let lineEl = el(tbody, "line", "", "tr");
+                let byteStr = hex.substring(i * 2, i * 2 + 2);
+                let byte = parseInt(byteStr, 16);
+                let binary = byte.toString(2).padStart(8, '0');
+                for (let b = 0; b < 8; b++) {
+                    el(lineEl, binary.charAt(b) === '0' ? "bit" : "bit on", "", "td");
+                }
+                el(lineEl, "byte", "0&" + byteStr, "td");
+                el(lineEl, "decimal", byte, "td");
+            }
+            hexView.dataset.hex = hex;
+            hexView.style.top = (e.pageY + 8) + "px";
+            hexView.style.left = (e.pageX + 4) + "px";
+            hexView.style.visibility = "visible";
+        } else {
+            hexView.dataset.hex = null;
+            hexView.style.visibility = "hidden";
         }
     });
 
@@ -229,7 +320,8 @@ document.addEventListener('DOMContentLoaded', e => {
         prettySrc.querySelectorAll("span.line.hovered").forEach(el => el.className = el.className.replace(" hovered", ""));
         if (e.target.dataset) {
             const lineRef = e.target.dataset.lineRef;
-            const ref = ast[lineRef];
+            const subRef = e.target.dataset.subRef;
+            const ref = lineRef ? ast[lineRef] : subRef ? { el: prettySrc.querySelectorAll(`[data-sub=\"${subRef}\"]`)[0]} : null;
             if (ref && ref.el) {
                 ref.el.className += " hovered";
             }

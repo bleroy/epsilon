@@ -43,6 +43,15 @@ input[type=radio] {
     cursor: pointer;
 }
 
+.sub-reference {
+    color: lightgreen;
+}
+
+.sub-reference:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .instructions {
     display: inline-block;
 }
@@ -78,6 +87,11 @@ input[type=radio] {
 
 .hex {
     color: pink;
+    cursor: pointer;
+}
+
+.hex.selected {
+    background-color: darkslategrey;
 }
 
 .string {
@@ -132,4 +146,56 @@ input[type=radio] {
 .active-pane {
     display: block;
     visibility: visible;
+}
+
+#hex-view {
+    position: absolute;
+    visibility: hidden;
+    padding: 0 0 4px 0;
+    border: solid 1px white;
+    border-radius: 3px;
+    background-color: black;
+    font-family: monospace;
+}
+
+#hex-view tbody {
+
+}
+
+#hex-view .line {
+    height: 16px;
+    border: none;
+    margin: 3px;
+}
+
+#hex-view .line td.bit {
+    height: 13px;
+    width: 13px;
+    border: solid 1px white;
+    margin: 1px;
+}
+
+#hex-view .line:nth-child(8n):not(:last-child) {
+    margin-bottom: 8px;
+}
+
+#hex-view .line td.bit.on {
+    background-color: white;
+}
+
+#hex-view .binary {
+    font-size: 28px;
+    font-family: initial;
+}
+
+#hex-view .byte {
+    margin: 0 4px;
+    text-align: right;
+    width: 3em;
+}
+
+#hex-view .decimal {
+    margin: 0 4px;
+    text-align: right;
+    width: 2em;
 }
