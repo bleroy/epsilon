@@ -9,6 +9,8 @@
     </head>
     <body>
         <h1 id="title">TI-99/4A Extended Basic source code browser</h1>
+        <div id="pretty-source" class="source active-pane">... Loading [pretty] ...</div>
+        <div id="original-source" class="source inactive-pane">... Loading ...</div>
         <div id="pretty-tab" class="active-tab">
             <input type="radio" name="tab" id="pretty-btn" value="pretty" checked/>
             <label for="pretty-btn" id="pretty-label" tabindex="0">Pretty</label>
@@ -17,8 +19,6 @@
             <input type="radio" name="tab" id="original-btn" value="original"/>
             <label for="original-btn" id="original-label" tabindex="1">Original</label>
         </div>
-        <div id="pretty-source" class="source active-pane">... Loading [pretty] ...</div>
-        <div id="original-source" class="source inactive-pane">... Loading ...</div>
         <table id="hex-view"></table>
         <script type="module" src="./default.js"></script>
     </body>
