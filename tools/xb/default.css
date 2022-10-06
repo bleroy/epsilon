@@ -7,6 +7,10 @@ body {
     font-family: sans-serif;
 }
 
+#title {
+    font-size: large;
+}
+
 input[type=radio] {
     display: none;
 }
@@ -96,6 +100,10 @@ input[type=radio] {
 
 .string {
     color: darkorange;
+}
+
+.comment {
+    color: darkgreen;
 }
 
 .inactive-tab {

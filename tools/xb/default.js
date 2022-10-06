@@ -133,12 +133,10 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
             const token = remaining.substring(0, nextPos);
             let separator = nextPos < remaining.length ? remaining.charAt(nextPos) : '';
 
-            // Update the current instruction.
-            instruction += token + separator;
-
             // What kind of token is this?
             const tokenClass =
                 (keywords.indexOf(token) != -1) ? "keyword" :
+                lastToken === "REM" ? "comment" :
                 // If it's after a CALL or a SUB and not a keyword, it's a sub name token and can't be a number or hex.
                 lastToken === "CALL" || lastToken === "SUB" ? "token" :
                 numbers.test(token) ? "number" :
@@ -164,6 +162,19 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
                 else if (token === "IF") {
                     ifDepth++;
                 }
+            }
+            
+            // A REM instruction means the rest of the line is raw comment text.
+            else if (lastInstruction === "REM") {
+                el(instructionEl, tokenClass, remaining);
+                instructions.push("REM " + remaining);
+                return {
+                    lineNumber,
+                    src: instructionsStr,
+                    instructions,
+                    el: lineEl,
+                    indent
+                };
             }
             // If we find an ELSE, we want to push the instruction so far and put the ELSE
             // on a separate line (as opposed to THEN, that we keep on the same line as the IF),
@@ -193,6 +204,8 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
             if (separator) {
                 el(instructionEl, operators.test(separator) ? "operator" : "separator", separator);
             }
+            // Update the current instruction.
+            instruction += token + separator;
             // If we just rendered THEN or ELSE, the next token should be on a new line (no ::)
             // with incremented indentation and be a new instruction.
             if (token === "THEN" || token === "ELSE") {
@@ -248,7 +261,6 @@ function parseAndRenderLine(pane, lineNumber, instructionsStr, indent = 0) {
         el: lineEl,
         indent
     };
-;
 }
 
 /** The list of known Extended Basic keywords.
@@ -298,6 +310,9 @@ const hex = /^[\da-fA-F]{2,}$/;
 
 // Set-up DOM loaded event.
 document.addEventListener('DOMContentLoaded', e => {
+    /** The title element
+     * @type {HTMLElement} */
+    const titleEl = document.getElementById("title");
     /** The element where we'll render the prettified source code.
      * @type {HTMLElement} */
     const prettySrc = document.getElementById("pretty-source");
@@ -335,11 +350,10 @@ document.addEventListener('DOMContentLoaded', e => {
     if (srcFileUrl.charAt(0) === '?') {
         srcFileUrl = srcFileUrl.substring(1);
     }
-    // Prefix with the path to the root from here.
-    srcFileUrl = pathToRoot + srcFileUrl;
     // Get the file.
     const req = new XMLHttpRequest();
     req.addEventListener("load", () => {
+        titleEl.innerText = srcFileUrl;
         const src = originalSrc.innerText = req.responseText;
         prettySrc.innerHTML = "";
         let indent = 0;
@@ -358,7 +372,8 @@ document.addEventListener('DOMContentLoaded', e => {
         });
     });
     req.responseType = "text";
-    req.open("GET", srcFileUrl);
+    // Prefix with the path to the root from here.
+    req.open("GET", pathToRoot + srcFileUrl);
     req.send();
 
     // Wire up events for tab switching.
@@ -391,7 +406,7 @@ document.addEventListener('DOMContentLoaded', e => {
             // If found, select and bring into view.
             if (ref && ref.el) {
                 ref.el.className += " selected";
-                ref.el.scrollIntoView();
+                ref.el.scrollIntoView({ behavior: "smooth", block: "center" });
             }
         }
         // If the clicked element is a hex string, display its representation in a popup.
