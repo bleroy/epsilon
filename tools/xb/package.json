@@ -1,0 +1,28 @@
+{
+  "name": "tixb",
+  "version": "1.0.0",
+  "description": "TI99 Extended Basic utilities and docs",
+  "main": "default.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bleroy/epsilon.git"
+  },
+  "keywords": [
+    "ti99",
+    "extended-basic",
+    "documentation"
+  ],
+  "author": "Bertrand Le Roy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bleroy/epsilon/issues"
+  },
+  "homepage": "https://github.com/bleroy/epsilon#readme",
+  "dependencies": {
+    "marked": "^4.2.3",
+    "yaml": "^2.1.3"
+  }
+}

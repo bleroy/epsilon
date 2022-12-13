@@ -1,14 +1,106 @@
+@media screen and (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
 html {
     background-color: black;
     color: white;
 }
 
 body {
-    font-family: sans-serif;
+    position: relative;
+    margin: 1em auto 2em auto;
+    padding: 0 2em;
+    max-width: 80rem;
 }
 
-#title {
+body:last-child {
+    margin-bottom: 0;
+}
+
+.back-to-top-link {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 2rem;
+    line-height: 3rem;
+    text-align: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    padding: 0.25rem;
+    color: white;
+    background-color: black;
+    border: solid 2px white;
+    right: 3rem;
+    top: calc(100vh - 5rem);
+    position: fixed;
+    position: sticky;
+    pointer-events: all;
+}
+
+.back-to-top-wrapper {
+    position: absolute;
+    top: 100vh;
+    right: 3rem;
+    bottom: -5em;
+    width: 3em;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: xx-large;
+    font-family: sans-serif;
+    font-style: italic;
+    background-color: darkblue;
+    color: white;
+    margin: 0;
+}
+
+h1 span {
+    display: block;
+    padding: 0.2em 0.3em;
+    margin: 0;
+    height: 40px;
+}
+
+h1 span.zeroth {
+    padding-bottom: 2em;
+    background-color: white;
+    color: black;
+    font-style: normal;
     font-size: large;
+}
+
+h1 span.second {
+    background-color: purple;
+}
+
+h1 span.third {
+    background-color: green;
+}
+
+h1 span.fourth {
+    background-color: black;
+    font-size: large;
+    padding: 1em 0 0 0.5em;
+}
+
+.blurb {
+    background-color: darkblue;
+    font-family: sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    color: black;
+    font-size: medium;
+    margin-top: 0;
+    padding: 4px;
+    height: 2em;
+}
+
+#pretty-source, #original-source {
+    margin-top: 2em;;
 }
 
 input[type=radio] {
@@ -166,10 +258,6 @@ input[type=radio] {
     font-family: monospace;
 }
 
-#hex-view tbody {
-
-}
-
 #hex-view .line {
     height: 16px;
     border: none;
@@ -206,4 +294,80 @@ input[type=radio] {
     margin: 0 4px;
     text-align: right;
     width: 2em;
+}
+
+.ref-index {
+    list-style: none;
+    padding: 0;
+}
+
+.ref-index-item {
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+.ref-index-item::after {
+    content: ", "
+}
+
+.ref-index-item:last-child::after {
+    display: none;
+}
+
+.ref-details-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ref-details-item {
+    margin-top: 3em;
+}
+
+.ref-item-title {
+    display: block;
+    border-top: solid 3px white;
+    border-bottom: double 4px white;
+    padding-top: 4px;
+    padding-bottom: 8px;
+    font-weight: bold;
+}
+
+.ref-item-format::before {
+    content: "Format";
+    font-weight: bold;
+}
+
+.ref-item-description::before {
+    content: "Decription";
+    font-weight: bold;
+}
+
+.ref-item-options::before {
+    content: "Options";
+    font-weight: bold;
+}
+
+.ref-item-examples::before {
+    content: "Examples";
+    font-weight: bold;
+}
+
+.ref-item-program::before {
+    content: "Program";
+    font-weight: bold;
+}
+
+.ref-item-format, .ref-item-description, .ref-item-options, .ref-item-examples, .ref-item-program {
+    margin: 12px 0 12px 0;
+}
+
+pre, p {
+    margin: 8px 0 0 0;
+}
+
+code[language=xb], code.language-xb {
+    display: block;
+    margin: 12px 0 0 0;
+    border: solid 1px gray;
+    border-radius: 4px;
 }

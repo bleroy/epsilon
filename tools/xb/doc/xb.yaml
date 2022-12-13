@@ -1,0 +1,217 @@
+title: TI Extended Basic for the TI-99/4 Home computer
+author: Robert E. Whitsitt, II and other staff members of the Texas Instruments Learning Center and the Texas Instruments Personal Computer Division
+copyright: (c) 1981 Texas Instruments Incorporated
+disclaimer: This work is reproduced here in a structured form for easier reference and is provided as-is with no guarantee.
+keywords:
+    ABS:
+        format: ABS(numeric expression)
+        description: |
+            The `ABS` function gives the absolute value of *numeric-expression*. If
+            *numeric-expression* is positive, `ABS` gives the value of numeric expressior. If
+            *numeric-expression* is negative, `ABS` gives its negative (a positive number). If
+            *numeric-expression* is zero, `ABS` returns zero. The result of `ABS` is always a
+            non-negative number.
+        examples: |
+            ```xb
+            100 PRINT ABS(42,3)
+            ```
+
+            `PRINT ABS(42.3)` prints `42.3`.
+
+            ```xb
+            100 VV=ABS(-6.124)
+            ```
+
+            `VV = ABS(-6.124)` sets `VV` equal to `6.124`.
+    ACCEPT:
+        format: |
+            ACCEPT | [AT(row, column)] (VALIDATE(datatype, ...)] [BEEP]
+            [ERASE ALL] [SIZE(numeric-expression)] :] variable
+        description: |
+            The `ACCEPT` statement suspends program execution until data is entered
+            from tne keyboard. Many options are available with `ACCEPT`, making it far
+            more versatile than `INPUT`. It may accept data at any screen position, make
+            an audible tone (beep) when ready to accept the data, erase all characters on
+            the screen before accepting data, limit data accepted to a certain number of
+            characters, and limit the type of characters accepted.
+        options: |
+            The following options may appear in any order following `ACCEPT`.
+
+            * `AT(row, column)` places the beginning of the input field at the specified row
+            and column. Rows are numbered 1 through 24. Columns are numbered 1
+            through 28 with column 1 corresponding to what is called column 3 in the
+            `VCHAR`, `HCHAR`, and `GCHAR` subprograms.
+
+            * `VALIDATE (data-type, ...)` allows only certain characters to be entered. *Data-
+            type* specifies which characters are acceptable. If more than one data-type is
+            specified, a character from any of the data-types given is acceptable. The
+            following are the data-types.
+
+                * `UALPHA` permits all uppercase alphabetic characters.
+                * `DIGIT` permits 0 through 9.
+                * `NUMERIC` permits 0 through 9, ".", "+", "-", and "E".
+                * *String-expression* permits the characters contained in *string-expression*.
+
+            * `BEEP` sounds a short tone to signal that the computer is ready to accept
+            input.
+
+            * `ERASE ALL` fills the entire screen with the blank character before accepting
+            input.
+
+            * `SIZE(numeric-expression)` allows up to the absolute value of *numeric-
+            expression* characters to be input. if *numeric-expression* is positive, the field
+            in which the data is entered is cleared before input is accepted. If *numeric-
+            expression* is negative, the input field is not blanked. This allows a default
+            value to be previously placed in the field and entered by just pressing `ENTER`.
+            If there is no `SIZE` clause, the line is blanked from the beginning position to
+            the end of the line.
+
+            If the `ACCEPT` statement is used without the AT clause, the last two
+            characters on the screen (at the lower right) are changed to "edge
+            characters" (ASCII code 31).
+        examples: |
+            ```xb
+            100 ACCEPT AT(5,7):Y
+            ```
+            `ACCEPT AT(5,7):Y` accepts data at the fifth row, seventh column of the screen into the variable Y.
+            
+            ```xb
+            100 ACCEPT VALIDATE("YN"):R$
+            ```
+            `ACCEPT VALIDATE("YN"):R$` accepts Y or N into the variable `R$`.
+
+            ```xb
+            100 ACCEPT ERASE ALL:B
+            ```
+            `ACCEPT ERASE ALL:B` accepts data into the variable B afler putting the blank character
+            into all screen positions.
+
+            ```xb
+            100 ACCEPT AT(R,C)SIZE(FIELDLEN)BEEP VALIDATE(DIGIT,"AYN"):X$
+            ```
+            `ACCEPT AT(R,C)SIZE(FIELDLEN)BEEP VALIDATE(DIGIT,"AYN"):X$` accepts a digit
+            or the letters A, Y, or N into the variable `X$`. The length of the input may be up to `FIELDLEN`
+            characters. The data is accepted at row `R`, column `C`, and a beep is sounded
+            before data is accepted.
+        program: |
+            This program illustrates a typical use of ACCEPT. It allows entry of up to 20 names and
+            addresses, and then displays them all.
+
+            ```xb
+            100 DIM NAME$(20),ADDR$(20)
+            110 DISPLAY AT(5,1)ERASE ALL:"NAME:"
+            120 DISPLAY AT(7,1):"ADDRESS:"
+            130 DISPLAY AT(23,1):"TYPE A ? TO END ENTRY."
+            140 FOR S=1 TO 20
+            150 ACCEPT AT(5,7)VALIDATE (UALPHA,"?")BEEP SIZE(13):NAME$(S)
+            160 IF NAME$(S)="?" THEN 200
+            170 ACCEPT AT(7,10)SIZE(12):ADDR$(S)
+            180 DISPLAY AT(7,10):"      "
+            190 NEXT S
+            200 CALL CLEAR
+            210 DISPLAY AT(1,1):"NAME","ADDRESS"
+            220 FOR T=1 TO S-1
+            230 DISPLAY AT(T+2,1):NAME$(T),ADDR$(T)
+            240 NEXT T
+            250 GOTO 250
+            ```
+
+            (press **SHIFT C** to stop the program.)
+    ASC:
+        format: ASC(string-expression)
+        description: |
+            The `ASC` function gives the ASCII character code which corresponds to the
+            first character of *string-expression*. A list of the ASCII codes is given in
+            [Appendix C](#appendix-c). The `ASC` function is the inverse of the [`CHRS$`](#CHR$) function.
+        examples: |
+            ```xb
+            100 PRINT ASC("A")
+            ```
+            `PRINT ASC("A")` prints 65.
+
+            ```xb
+            100 B=ASC("1")
+            ```
+            `B=ASC("1")` sets `B` equal to 49.
+
+            ```xb
+            100 DISPLAY ASC('HELLO”)
+            ```
+            `DISPLAY ASC("HELLO")` displays 72.
+    ATN:
+        format: ATN(numeric-expression)
+        description: |
+            The `ATN` function returns the measure of the angle (in radians) whose
+            tangent is *numeric-expression*. If you want the equivalent angle in degrees,
+            multiply by `180/PI`. The value given by the `ATN` function is always in the
+            range `-PI/2 < ATN(X) < PI/2`.
+        examples: |
+            ```xb
+            100 PRINT ATN(O)
+            ```
+            `PRINT ATN(Q)` prints `Q`.
+
+            ```xb
+            100 Q=ATN(.44)
+            ```
+            `Q=ATN(.44)` sets Q equal to `0.4145068746`.
+    BREAK:
+        format: BREAK [line-number-list]
+        description: |
+            The `BREAK` command requires a *line-number-list*. It causes the program to
+            stop immediately before the lines in *line-number-list* are executed. After a
+            breakpoint is taken because the line is listed in *ine-number-list*, the
+            breakpoint is removed and no more breakpoints occur at that line unless a
+            new `BREAK` command or statement is given.
+
+            The `BREAK` statement without *line-number-list* causes the program to stop
+            when it is encountered. The line at which the program stops is called a
+            breakpoint. Every time a `BREAK` statement without *line-number-list* is
+            encountered, the program stops even if an [`ON BREAK NEXT`](#ON%20BREAK%20NEXT)
+            statement has been executed.
+
+            You can also cause a breakpoint in a program by pressing `SHIFT+C` (`CLEAR`)
+            while the program is running, unless breakpoints are being handled in some
+            other way because of the action of [`ON BREAK`](#ON%20BREAK).
+
+            `BREAK` is useful in finding out why a program is not running exactly as you
+            expect it to. When the program has stopped you can print values of variables
+            to find out what is happening in the program. You may enter any command
+            or statement that can be used as a command. If you edit the program,
+            however, you cannot resume with [`CONTINUE`](#CONTINUE).
+
+            A way to remove breakpoints set with `BREAK` followed by line numbers is
+            the [`UNBREAK`](#UNBREAK) command. Also, if a breakpoint is set at a program
+            line and that line is deleted, the breakpoint is removed. Breakpoints are also
+            removed when a program is saved with the [`SAVE`](#SAVE) command. See
+            [`ON BREAK`](#ON%20BREAK) for a way to handle breakpoints.
+
+            Whenever a breakpoint occurs, the standard character set is restored. Thus
+            any standard characters that had been redefined by [`CALL CHAR`](#CALL%20CHAR)
+            are restored to the standard characters. A breakpoint also restores the standard
+            colors, deletes sprites, and resets sprite magnification to the default value
+            of 1.
+        options: |
+            The *line-number-list* is optional when `BREAK` is used as a statement, but is
+            required when `BREAK` is used as a command. When present, it causes the
+            program to stop immediately before the lines in *line-number-list* are
+            exccuted. After a breakpoint is taken because the line is listed in
+            *line-number-list*, the breakpoint is removed and no more breakpoints occur at
+            that line unless a new `BREAK` command or statement is given.
+        examples: |
+            ```xb
+            150 BREAK
+            ```
+            `BREAK` as a statement causes a breakpoint when that statement is executed.
+
+            ```xb
+            110 BREAK 120,130
+            ```
+            `BREAK 120,130` as a statement causes breakpoints before execution of the line
+            numbers listed.
+
+            ```xb
+            BREAK 200,300,1105
+            ```
+            `BREAK 200,300,1105` as a command causes breakpoints before execution of the
+            line numbers listed.
