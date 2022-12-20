@@ -122,7 +122,7 @@ keywords:
         description: |
             The `ASC` function gives the ASCII character code which corresponds to the
             first character of *string-expression*. A list of the ASCII codes is given in
-            [Appendix C](#appendix-c). The `ASC` function is the inverse of the [`CHRS$`](#CHR$) function.
+            [Appendix C](#Appendix%20C). The `ASC` function is the inverse of the [`CHRS$`](#CHR$) function.
         examples: |
             ```xb
             100 PRINT ASC("A")
@@ -154,7 +154,7 @@ keywords:
             ```xb
             100 Q=ATN(.44)
             ```
-            `Q=ATN(.44)` sets Q equal to `0.4145068746`.
+            `Q=ATN(.44)` sets `Q` equal to `0.4145068746`.
     BREAK:
         format: BREAK [line-number-list]
         description: |
@@ -215,3 +215,246 @@ keywords:
             ```
             `BREAK 200,300,1105` as a command causes breakpoints before execution of the
             line numbers listed.
+    BYE:
+        format: BYE
+        description: |
+            The `BYE` command ends TI Extended BASIC and returns the computer to
+            the master title screen. All open files are closed, all program lines are erased
+            and the computer is reset. Always use the `BYE` command instead of `SHIFT Q`
+            (`QUIT`) to leave TI Extended BASIC. `SHIFT Q` (`QUIT`) does not close files, which
+            may result in data being lost from external devices.
+    CALL:
+        format: CALL subprogram-name [(parameter-list)]
+        description: |
+            The `CALL` statement transfers control to *subprogram-name*. The
+            subprogram may be either one built into TI Extended BASIC, such as
+            [`CLEAR`](#CLEAR%20subprogram), or one you have written. After the subprogram is executed. the next
+            statement after the `CALL` statement is executed. `CALL` may be either a
+            statement or a command for calling built-in TI Extended BASIC
+            subprograms, but must be a statement when calling subprograms that you
+            write.
+        options: |
+            The *parameter-list* is defined according to the subprogram you are calling.
+            Some require no parameters at all. some require parameters, and some have
+            optional parameters. Each built-in subprogram is discussed under its own
+            entry in this manual. The subprograms you can write are discussed in [the
+            section in Chapter II on subprograms](#subprograms) and under [`SUB`](#SUB).
+            The following are the subprogram names of the built-in TI Extended BASIC subprograms:
+
+            `CHAR HCHAR PATTERN CHARPAT INIT PEEK CHARSET JOYST POSITION CLEAR KEY SAY COINC LINK
+            SCREEN COLOR LOAD SOUND DELSPRITE LOCATE SPGET DISTANCE MAGNIFY SPRITE ERR MOTION
+            VCHAR GCHAR VERSION`
+        program: |
+            This program illustrates the use of `CALL` with a supplied subprogram
+            ([`CLEAR`](#CLEAR%20subprogram)) in line 100 and the use of a written subprogram
+            (`TIMES`) in line 120.
+
+            ```xb
+            100 CALL CLEAR
+            110 X=4
+            120 CALL TIMES(X)
+            130 PRINT X
+            140 STOP
+            200 SUB TIMES(Z)
+            210 Z=Z*PI
+            220 SUBEND
+            ```
+
+            Screen clears and displays `12.56637061`
+    CHAR subprogram:
+        format: CALL CHAR(character-code, pattern-identifier [,...] )
+        description: |
+            The `CHAR` subprogram allows you to define special graphics characters. You
+            can redefine the standard set of characters (ASCII codes 32-95) and the
+            undefined characters, ASCII codes 96-143. Note that fewer program defined
+            characters are available in TI Extended BASIC tran in Ti BASIC, where
+            ASCH codes 96-156 are allowed. The `CHAR` subprogram is the inverse of the
+            [`CHARPAT`](#CHARPAT) subprogram.
+
+            *Character-code* specities the character which you wish to define and must be
+            a numeric expression with a value from 32 through 143. *Pattern-identifier* is
+            a O through 64 character string expression which specifies the pattern of the
+            character(s) you are defining. This string expression is a coded representation
+            of the dots which make up a character on the screen.
+
+            Each character is made up of 64 dots comprising an 8 by 8 grid as shown
+            below.
+
+            ```hex
+                  | LEFT BLOCKS | RIGHT BLOCKS
+            ----------
+            ROW 1 | 0 | 0
+            ROW 2 | 0 | 0
+            ROW 3 | 0 | 0
+            ROW 4 | 0 | 0
+            ROW 5 | 0 | 0
+            ROW 6 | 0 | 0
+            ROW 7 | 0 | 0
+            ROW 8 | 0 | 0
+            ```
+
+            Each row is partitioned into two blocks of four dots each.
+
+            Each character in the *pattern-identifier* describes the pattern in one block of
+            one row. The rows are described from left to right and from top to bottom.
+            Therefore the first two characters in the *pattern-identifier* describe the
+            pattern for row one of the grid, the next two the second row, and so on.
+
+            Characters are created by turning some dots "on" and leaving others "off".
+            The space character (ASCII code 32) is a character with all the dots turned
+            "off". Turning all the dots "on" produces a solid block. The color of the on
+            dots is the foreground color. The color of the off dots is the background color.
+
+            All the standard characters are set with the appropriate dots on. To create a
+            new character, you specify what dots to turn on and leave off. In the
+            computer a binary code, one number for each of the 64 dots, is used to
+            specify which dots are on and off in a particular block. A more human-
+            readable form of binary is hexadecimal. The following table shows all the
+            possible on/off conditions for the four dots in a given block, and the binary
+            and hexadecimal codes for each condition.
+
+            ```hex
+            Binary | BLOCK, hex & decimal
+            -----------
+            0000 | 0
+            0001 | 1
+            0010 | 2
+            0011 | 3
+            0100 | 4
+            0101 | 5
+            0110 | 6
+            0111 | 7
+            1000 | 8
+            1001 | 9
+            1010 | A
+            1011 | B
+            1100 | C
+            1101 | D
+            1110 | E
+            1111 | F
+            ```
+
+            If the *pattern-identifier* is less than 16 characters, the computer assumes
+            that the remaining characters are zeros. If the *pattern-identifier* is 17 to 32
+            characters, two character-codes are defined, the first with the first through
+            sixteenth characters and the second with the remaining characters, with
+            zeros added as needed. If the *pattern-identifier* is 33 to 48 characters, three
+            character-codes are defined. the first with the first through sixteenth
+            characters, the second with the seventeenth through thirty-second
+            characters, and the third with the remaining characters, with zeros added as
+            needed. If the *pattern-identifier* is 49 to 64 characters, four character-codes
+            are defined, the first with the first through sixteenth characters, the second
+            with the seventeenth through thirty-second characters, the third with the
+            thirty-third through forty-eighth characters, and the fourth with the
+            remaining characters, with zeros added as needed. If the *pattern-identifier* is
+            longer than 64 characters or is long enough to define characters higher than
+            character code 143, the excess is ignored.
+        program: |
+            To describe the dot pattern pictured below, you code this string for `CALL CHAR`:
+            `"1898FF3D3C3CE404"`.
+
+            ```hex
+            | BLOCKS and codes
+            --------
+            ROW 1 | 18
+            ROW 2 | 98
+            ROW 3 | FF
+            ROW 4 | 3D
+            ROW 5 | 3C
+            ROW 6 | 3C
+            ROW 7 | E4
+            ROW 8 | 04
+            ```
+
+            This program uses this and one other string to make a figure "dance".
+
+            ```xb
+            100 CALL CLEAR
+            110 A$="1898FF3D3C3CE404"
+            120 B$="1819FFBC3C3C2720"
+            130 CALL COLOR(9,7,12)
+            140 CALL VCHAR(12,16,96)
+            150 CALL CHAR(96,A$)
+            160 GOSUB 200
+            170 CALL CHAR(96,B$)
+            180 GOSUB 200
+            190 GOTO 150
+            200 FOR DELAY=1 to 50
+            210 NEXT DELAY
+            220 RETURN
+            ```
+
+            The program clears the screen and moves the character (press `SHIFT C` to stop the program).
+            
+            If a program stops for a breakpoint, the predefined characters (ASCII codes
+            32 through 95) are reset to their standard pattern. Those with codes 96 through
+            143 keep their program defined pattern. When the program ends normally or
+            because of an error, all predefined charaters are reset.
+
+            ```xb
+            100 CALL CLEAR
+            110 CALL CHAR(96,"FFFFFFFFFFFFFFFF")
+            120 CALL CHAR(42,"0F0F0F0F0F0F0F0F")
+            130 CALL HCHAR(12,17,42)
+            140 CALL VCHAR(14,17,96)
+            150 FOR DELAY=1 TO 500
+            160 NEXT DELAY
+            ```
+    CHARPAT subprogram:
+        format: CALL CHARPAT(character-code, string-variable |,...]
+        description: |
+            The `CHARPAT` subprogram returns in *string-variable* the 16-character
+            pattern identifier that specifies the pattern of *character-code*. The `CHARPAT`
+            subprogram is the inverse of the [`CHAR` subprogram](#CHAR%20subprogram).
+            See the [`CHAR` subprogram](#CHAR%20subprogram) for an explanation of the value
+            returned in *string-variable*.
+        examples: |
+            ```xb
+            100 CALL CHARPAT(33,C$)
+            ```
+
+            `CALL CHARPAT(33,C$)` sets `C$` equal to `"0010101010001000"`, the pattern
+            identifier for character 33, the exclamation point.
+
+            ```hex
+            |00
+            |10
+            |10
+            |10
+            |10
+            |00
+            |10
+            |00
+            ```
+    CHARSET subprogram:
+        format: CALL CHARSET
+        description: |
+            The `CHARSET` subprogram restores the standard character patterns and
+            standard colors for characters 32 through 95. Normally when a program is
+            run by another program using `RUN` as a statement, characters 32 through
+            95 are not reset to their standard patterns and colors. `CHARSET` is useful
+            when this feature is not desired.
+        examples: |
+            ```xb
+            100 CALL CHARSET
+            ```
+            `CALL CHARSET` restores the standard characters and their colors.
+    CHR$:
+        format: CHR$(numeric-expression)
+        description: |
+            The `CHR$` function returns the character corresponding to the ASCII
+            character code specified by *numeric-expression*. The `CHR$` function is the
+            inverse of the [`ASC`](#ASC) function. A list of the ASCII character codes for each
+            character in the standard character set is given in [Appendix C](#Appendix%20C).
+        examples: |
+            ```xb
+            100 PRINT CHR$(72)
+            ```
+
+            `PRINT CHR$(72)` prints `H`.
+
+            ```xb
+            100 X$=CHR$(33)
+            ```
+
+            `X$=CHRS(33)` sets `X$` equal to `"!"`.

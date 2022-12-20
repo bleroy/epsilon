@@ -248,7 +248,7 @@ input[type=radio] {
     visibility: visible;
 }
 
-#hex-view {
+.hex-view {
     position: absolute;
     visibility: hidden;
     padding: 0 0 4px 0;
@@ -258,39 +258,53 @@ input[type=radio] {
     font-family: monospace;
 }
 
-#hex-view .line {
+.hex-view.inline {
+    position: inherit;
+    visibility: visible;
+}
+
+.hex-view thead tr th {
+    background-color: white;
+    color: black;
+}
+
+.hex-view.inline .line {
+    display: table-row;
+}
+
+.hex-view .line {
     height: 16px;
     border: none;
     margin: 3px;
 }
 
-#hex-view .line td.bit {
+.hex-view .line td.bit {
     height: 13px;
     width: 13px;
     border: solid 1px white;
     margin: 1px;
 }
 
-#hex-view .line:nth-child(8n):not(:last-child) {
+.hex-view .line:nth-child(8n):not(:last-child) {
     margin-bottom: 8px;
 }
 
-#hex-view .line td.bit.on {
+.hex-view .line td.bit.on {
     background-color: white;
 }
 
-#hex-view .binary {
+.hex-view .binary {
     font-size: 28px;
     font-family: initial;
 }
 
-#hex-view .byte {
+.hex-view .byte {
     margin: 0 4px;
     text-align: right;
     width: 3em;
 }
 
-#hex-view .decimal {
+.hex-view .decimal {
     margin: 0 4px;
     text-align: right;
     width: 2em;

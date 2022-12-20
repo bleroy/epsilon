@@ -4,16 +4,20 @@
 'use strict'
 
 import { el, html } from "../../lib/dom.js";
-import { prettify } from "../../lib/xb.js";
+import { prettify, renderByte } from "../../lib/xb.js";
 import { parse } from "../node_modules/yaml/browser/dist/public-api.js";
 import { marked } from "../node_modules/marked/lib/marked.esm.js";
 
 function htmlFromMd(str) {
-    return sampleHandler(html(marked.parse(str)));
+    return hexHandler(sampleHandler(html(marked.parse(str))));
 }
 
 function sampleHandler(str) {
     return html(str.html.replace(/\<code\>xb /g, "<code class=\"language-xb\">"));
+}
+
+function hexHandler(str) {
+    return html(str.html.replace(/\<code\>hex /g, "<code class=\"language-hex\">"));
 }
 
 // Set-up DOM loaded event.
@@ -46,5 +50,43 @@ document.addEventListener('DOMContentLoaded', async e => {
     // Prettify all code samples
     for (let codeEl of document.querySelectorAll("code[language=xb], code.language-xb")) {
         prettify(codeEl);
+    }
+
+    // Prettify all hexadecimal samples
+    for (let codeEl of document.querySelectorAll("code[language=hex], code.language-hex")) {
+        const src = codeEl.innerText;
+        const parent = codeEl.parentNode;
+        const table = el(document.body, "hex-view inline", null, "table");
+        const header = el(table, null, null, "thead");
+        const tbody = el(table, null, null, "tbody");
+        let first = true;
+        const hasHeader = src.indexOf("---") !== -1;
+        for (let line of src.split(/[\r\n]/g)) {
+            let firstCell = true;
+            if (line.indexOf("---") === 0) continue;
+            if (first && hasHeader) {
+                first = false;
+                const headerRow = el(header, null, null, "tr");
+                for (let headEntry of line.split(/\s*\|\s*/g)) {
+                    el(headerRow, null, headEntry, "th", { colspan: firstCell ? 1 : 10 });
+                    if (firstCell) {
+                        firstCell = false;
+                    }
+                }
+            }
+            else if (line.replace(/\s/g, "") !== "") {
+                const row = el(tbody, "line", null, "tr");
+                for (let entry of line.split(/\s*\|\s*/g)) {
+                    if (firstCell) {
+                        el(row, null, entry, "td");
+                        firstCell = false;
+                    } else {
+                        renderByte(row, entry);
+                    }
+                }
+            }
+        }
+        parent.insertBefore(table, codeEl);
+        parent.removeChild(codeEl)
     }
 });
