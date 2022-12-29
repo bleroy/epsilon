@@ -20,6 +20,14 @@ body:last-child {
     margin-bottom: 0;
 }
 
+a {
+    color: lightblue;
+}
+
+a:visited {
+    color: violet;
+}
+
 .back-to-top-link {
     display: inline-block;
     text-decoration: none;

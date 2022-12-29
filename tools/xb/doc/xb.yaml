@@ -458,3 +458,166 @@ keywords:
             ```
 
             `X$=CHRS(33)` sets `X$` equal to `"!"`.
+        program: |
+            For a complete list of all ASCII characters and their corresponding ASCII values,
+            run this program.
+
+            ```xb
+            100 CALL CLEAR
+            110 FOR A=32 TO 95
+            120 PRINT A;"""";CHR$(A);"""";
+            130 NEXT A
+            ```
+    CLEAR subprogram:
+        format: CALL CLEAR
+        description: |
+            The `CLEAR` subprogram is used to clear (erase) the entire screen. When the
+            `CLEAR` subprogram is called, the space character (ASCII code 32) is placed
+            in all positions on the screen.
+        program: |
+            When the next program is run, the screen is cleared before the
+            `PRINT` statements are performed.
+
+            ```xb
+            100 CALL CLEAR
+            110 PRINT “HELLO THERE!”
+            120 PRINT “HOW ARE YOU?"
+            ```
+
+            Screen clears and displays:
+            
+            ```
+            HELLO THERE!
+            HOW ARE YOU?
+            ```
+
+            If the space character (ASCII code 32) has been redefined by the
+            [`CALL CHAR`](#CHAR%20subprogram) subprogram, the screen is filled with
+            the new character when `CALL CLEAR` is performed.
+
+            ```xb
+            100 CALL CHAR(32,"0103070F1F3F7FFF")
+            110 CALL CLEAR
+            120 GOTO 120
+            ```
+
+            The screen is filled with ◢ (Press `SHIFT C` to stop the program).
+    CLOSE:
+        format: "CLOSE #file-number [: DELETE]"
+        description: |
+            The `CLOSE` statement stops a program's use of the file referenced by
+            *#file-number*.
+            After the `CLOSE` statement is performed, the file cannot be used by
+            the program unless you [`OPEN`](#OPEN) it again.
+            The computer no longer associates the *#file-number* with the closed file,
+            so you can assign that number to another file.
+
+            When no program is running, the following actions close all open files:
+            * Editing the program
+            * Entering the [`BYE`](#BYE) command
+            * Entering the [`RUN`](#RUN) command
+            * Entering the [`NEW`](#NEW) command
+            * Entering the [`OLD`](#OLD) command
+            * Entering the [`SAVE`](#SAVE) command
+            * Entering the [`LIST`](#LIST) command to a device
+
+            If you use `SHIFT Q` (QUIT) to leave TI Extended BASIC, the computer does not
+            close any open files, and you may lose data on any files that are open. To
+            avoid this possibility. you should leave TI Extended BASIC with [`BYE`](#BYE)
+            instead of `SHIFT Q` (QUIT).
+        options: |
+            You may delete a diskette file at the same time you close it by adding
+            "`:DELETE`" to the statement. Other devices, such as cassette recorders, do
+            not allow `DELETE`. The manual for each device discusses the use of
+            `DELETE`.
+        examples: |
+            When the computer performs the `CLOSE` statement for a cassette tape
+            recorder, you receive instructions for operating the recorder.
+
+            ```xb
+            100 OPEN #24:"CS1",INTERNAL,INPUT,FIXED
+            .
+            .
+            .
+            -- program lines
+            .
+            .
+            .
+            200 CLOSE #24
+            ```
+
+            When run, the program displays opening instructions, runs and then displays
+            `* PRESS CASSETTE STOP CS1 THEN PRESS ENTER`.
+
+            The `CLOSE` statement for a diskette requires no further action on your part.
+
+            ```xb
+            100 OPEN #24:"DSK1.MYDATA",INTERNAL,INPUT,FIXED
+            .
+            --program lines
+            .
+            200 CLOSE #24
+            ```
+
+            This program runs with no prompt to the user.
+    COINC subprogram:
+        format: |
+            CALL COINC(#sprite-number,#sprite-number,tolerance,numeric-variable)
+
+            CALL COINC{#sprite-number,dot-row,dot-column,tolerance,numeric-variable)
+
+            CALL COINC(ALL,numeric-variable)
+        description: |
+            The `COINC` subprogram detects a coincidence between a sprite and another
+            sprite or a position on the screen. The value returned in *numeric-variable*
+            is -1 if there is a coincidence and 0 if there is no coincidence.
+
+            If the keyword `ALL` is given, the coincidence of any two sprites is reported.
+            If two sprites are identified by *#sprite-number*, their coincidence is reported.
+            If *#sprite-number* and a location are identified, their coincidence is reported.
+
+            If ihe keyword `ALL` is given, sprites are coincident only if one or more of the
+            dots which make them up occupy the same position on the screen. If two
+            sprites or a sprite and a location are given, then tolerance must be specified,
+            and two sprites are coincident if their upper left hand corners are within the
+            value specified by tolerance. A sprite and a location are coincident if the
+            upper left hand corner of the sprite and the position specified by dot-row and
+            doi-column are within the value specified by tolerance. These coincidents are
+            reported even if there is no apparent overlap of the sprites or the sprite and
+            the position.
+
+            *Dot-row* and *dot-column* are numbered consecutively starting with 1 in the
+            upper ieft hand corner of the screen. Thus the *dot-row* can be from 1 to 192
+            and the *dot-column* can be from 1 to 256. (Actually the *dot-row* can go up to
+            256, but the positions from 193 through 256 are off the bottom of the
+            screen.) If any part of the sprite occupies the position given, then there is a
+            coincidence.
+
+            Whether or not a coincidence is detected depends on several variables. If the
+            sprites are moving very quickly, `COINC` may not be able to detect their
+            coincidence. Also, `COINC` checks for a coincidence only when it is called, so a
+            program may miss a coincidence that occurs when the program is executing
+            some other statement.
+        program: |
+            This program defines two sprites that consist of a triangle.
+
+            ```xb
+            100 CALL CLEAR
+            110 S$="0103070F1F3F7FFF"
+            120 CALL CHAR(96,S$)
+            130 CALL CHAR(100,S$)
+            140 CALL SPRITE(#1,96,7,8,8)
+            150 CALL SPRITE(#2,100,5,1,1)
+            160 CALL COINC(#1,#2,10,C)
+            170 PRINT C
+            180 CALL COINC(ALL,C)
+            190 PRINT C
+            ```
+
+            When run, the program outputs -1 and 0.
+
+            Line 160 shows a coincidence because the sprites are within 10
+            dots of each other.
+
+            Line 180 shows no coincidence because the shaded areas of the
+            sprites are not coincident.
